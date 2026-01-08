@@ -1,13 +1,23 @@
 @import "tailwindcss";
 
 body {
-  @apply bg-white text-gray-800;
+  background-color: white;
+  color: rgb(31 41 55);
 }
 
 .container {
-  @apply max-w-7xl mx-auto px-4;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .section {
-  @apply py-20;
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+.timeline-bg {
+  background-color: #ded3bc1a;
 }

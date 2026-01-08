@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "next/image"
 
 const steps = [
   {
@@ -21,33 +21,36 @@ const steps = [
     desc: "Бодит туршлагаас суралц",
     img: "/steps/step4.png",
   },
-];
+]
 
 export default function Timeline() {
   return (
-    <section className="section container">
-      <h2 className="text-3xl font-bold text-center mb-14">
+    <section className="section container timeline-bg">
+      <h2 className="text-3xl md:text-4xl font-bold text-center mb-14 text-gray-800">
         NEXT STEP – Таны аялал
       </h2>
 
-      <div className="grid md:grid-cols-4 gap-10">
+      <div className="grid md:grid-cols-4 gap-8">
         {steps.map((step, i) => (
           <div
             key={i}
-            className="bg-white rounded-2xl p-6 text-center shadow hover:shadow-xl transition"
+            className="bg-[#e4c3811a] rounded-3xl p-8 text-center shadow-md hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
           >
-            <Image
-              src={step.img}
-              alt={step.title}
-              width={120}
-              height={120}
-              className="mx-auto mb-6"
-            />
-            <h3 className="font-semibold text-lg">{step.title}</h3>
-            <p className="mt-2 text-gray-600 text-sm">{step.desc}</p>
+            <div className="w-40 h-40 mx-auto mb-6 relative">
+              <Image
+                src={step.img}
+                alt={step.title}
+                fill
+                className="object-contain"
+              />
+            </div>
+            <h3 className="font-semibold text-lg md:text-xl text-gray-900 mb-2">
+              {step.title}
+            </h3>
+            <p className="text-gray-700 text-sm md:text-base">{step.desc}</p>
           </div>
         ))}
       </div>
     </section>
-  );
+  )
 }

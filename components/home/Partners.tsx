@@ -1,10 +1,26 @@
 import Image from "next/image"
 
 const partners = [
-  "/partners/worldvision.png",
-  "/partners/edu.png",
-  "/partners/tetgeleg.png",
-  "/partners/khuvsgul.jpg",
+  {
+    name: "Дэлхийн зөн",
+    logo: "/partners/worldvision.png",
+    url: "https://www.worldvision.org/",
+  },
+  {
+    name: "Хөвсгөл аймгийн боловсролын газар",
+    logo: "/partners/edu.png",
+    url: "http://ed.khs.gov.mn/",
+  },
+  {
+    name: "Tetgeleg",
+    logo: "/partners/tetgeleg.png",
+    url: "https://www.tetgeleg.mn/",
+  },
+  {
+    name: "Хөвсгөл аймгийн засаг даргын тамгын газар",
+    logo: "/partners/khuvsgul.jpg",
+    url: "https://khovsgol.gov.mn/",
+  },
 ]
 
 export default function Partners() {
@@ -16,16 +32,26 @@ export default function Partners() {
         </h2>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 items-center">
-          {partners.map((logo, i) => (
-            <div key={i} className="flex justify-center">
+          {partners.map((partner, i) => (
+            <a
+              key={i}
+              href={partner.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-col items-center group transition-transform hover:scale-105"
+            >
               <Image
-                src={logo}
-                alt="Partner logo"
+                src={partner.logo}
+                alt={partner.name}
                 width={140}
                 height={60}
-                className="object-contain"
+                className="object-contain mb-2"
               />
-            </div>
+              <span className="text-gray-800 font-medium flex items-center gap-1 transition-colors group-hover:text-blue-500">
+                {partner.name}
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </span>
+            </a>
           ))}
         </div>
       </div>
