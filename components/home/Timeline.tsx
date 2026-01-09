@@ -12,8 +12,8 @@ const steps = [
     img: "/steps/step2.png",
   },
   {
-    title: "Их сургууль судал",
-    desc: "Монголын их сургуулиудын мэдээлэл",
+    title: "Их сургуулиа судал",
+    desc: "Монголын их сургуулиудын мэдээлэлтэй танилц",
     img: "/steps/step3.png",
   },
   {
@@ -27,7 +27,7 @@ export default function Timeline() {
   return (
     <section className="section container timeline-bg">
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-14 text-gray-800">
-        NEXT STEP – Таны аялал
+        Оюутан болох эхний алхам
       </h2>
 
       <div className="grid md:grid-cols-4 gap-8">
