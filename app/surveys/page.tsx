@@ -4,7 +4,7 @@ export default function SurveysPage() {
       <h1 className="text-2xl font-bold mb-6">
         Судалгаа
       </h1>
-      <p>Судалгааны асуултууд энд байна.</p>
+      <p>Судалгаанууд</p>
     </section>
   );
 }

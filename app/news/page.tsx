@@ -4,7 +4,7 @@ export default function NewsPage() {
       <h1 className="text-2xl font-bold mb-6">
         Мэдээ, нийтлэл
       </h1>
-      <p>Боловсролын мэдээнүүд энд.</p>
+      <p>Мэдээнүүд</p>
     </section>
   );
 }

@@ -37,6 +37,7 @@ export default function Header() {
         {/* NAV */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
           {[
+            {name: "Нүүр хуудас", href: "/" },
             { name: "Их сургууль", href: "/universities" },
             { name: "Менторууд", href: "/mentors" },
             { name: "Судалгаа", href: "/surveys" },

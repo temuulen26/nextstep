@@ -4,7 +4,7 @@ const partners = [
   {
     name: "Дэлхийн зөн",
     logo: "/partners/worldvision.png",
-    url: "https://www.worldvision.org/",
+    url: "https://worldvision.mn/en",
   },
   {
     name: "Хөвсгөл аймгийн боловсролын газар",
