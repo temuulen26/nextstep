@@ -29,7 +29,7 @@ export default function Header() {
             />
           </motion.div>
 
-          <span className="font-extrabold text-lg tracking-wide text-orange-600 group-hover:text-orange-700 transition">
+          <span className="font-extrabold text-lg tracking-wide text-[#ff673d] group-hover:text-orange-700 transition">
             NEXT STEP
           </span>
         </Link>
@@ -49,10 +49,10 @@ export default function Header() {
               href={item.href}
               className="relative group"
             >
-              <span className="group-hover:text-orange-600 transition">
+              <span className="group-hover:text-[#ff673d] transition">
                 {item.name}
               </span>
-              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-orange-500 group-hover:w-full transition-all duration-300" />
+              <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-[#ff673d] group-hover:w-full transition-all duration-300" />
             </Link>
           ))}
         </nav>
@@ -61,7 +61,7 @@ export default function Header() {
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
           <Link
             href="/auth/login"
-            className="relative overflow-hidden bg-orange-500 text-white px-5 py-2 rounded-xl font-medium shadow-lg hover:bg-orange-600 transition"
+            className="relative overflow-hidden bg-[#FF673d] text-white px-5 py-2 rounded-xl font-medium shadow-lg hover:bg-orange-600 transition"
           >
             <span className="relative z-10">Нэвтрэх</span>
             <span className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100 transition" />

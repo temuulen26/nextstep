@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useState } from "react";
-import { FiMail } from "react-icons/fi";
+import { FiMail, FiPhoneCall } from "react-icons/fi";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { i } from "framer-motion/client";
 
@@ -28,7 +28,7 @@ export default function AboutPage() {
     <main className="overflow-hidden">
 
       {/* HERO */}
-      <section className="relative bg-gradient-to-br from-[#ff673d]/20 via-white to-white py-14">
+      <section className="relative bg-gradient-to-br from-[#ff673d]/1 via-white to-white py-14 mb-10">
         <div className="absolute -top-24 -left-24 w-[380px] h-[380px] bg-[#ff673d]/30 rounded-full blur-3xl" />
 
         <div className="container grid md:grid-cols-2 gap-10 items-center relative">
@@ -56,7 +56,7 @@ export default function AboutPage() {
           {/* IMAGE SLIDER (4:3) */}
           <div className="relative w-full max-w-[520px] mx-auto">
 
-            <div className="relative overflow-hidden rounded-2xl shadow-xl bg-white aspect-[4/3]">
+            <div className="relative overflow-hidden rounded-2xl shadow-xl bg-white aspect-[6/3.5]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={index}
@@ -68,7 +68,7 @@ export default function AboutPage() {
                 >
                   <Image
                     src={images[index]}
-                    alt="Next Step Event"
+                    alt="Next Step 2025 Event"
                     fill
                     sizes="(max-width: 768px) 100vw, 520px"
                     className="object-cover"
@@ -109,11 +109,8 @@ export default function AboutPage() {
             Сурагчид их сургууль, мэргэжлээ сонгох үед
             бодит туршлага, зөв чиглүүлэг хамгийн чухал.
             <br /><br />
-            Тиймээс Next Step нь
-            <strong className="text-gray-800">
-              {" "}жинхэнэ оюутнуудын туршлага
-            </strong>-аар дамжуулан
-            ирээдүйн сонголтыг илүү ойлгомжтой болгодог.
+            Тиймээс Next Step хөтөлбөр нь ментор оюутнуудын туршлагаар дамжуулан
+            ирээдүйн сонголтыг тань хийхэд тусалдаг.
           </p>
         </div>
       </section>
@@ -153,13 +150,13 @@ export default function AboutPage() {
       Бидэнтэй холбогдож илүү их мэдээлэл аваарай
     </p>
 
-    <div className="mt-10 grid md:grid-cols-3 gap-6">
+    <div className="mt-10 grid md:grid-cols-4 gap-6">
       {[
         { 
           title: "Имэйл", 
           value: "edcouncil901@gmail.com", 
           icon: <FiMail className="text-2xl" />, 
-          link: "edcouncil901@gmail.com" 
+          link: "https://educouncil901@gmail.com" 
         },
         { 
           title: "Instagram", 
@@ -168,10 +165,16 @@ export default function AboutPage() {
           link: "https://www.instagram.com/just_graduated.mn/" 
         },
         { 
+          title: "Phone", 
+          value: "+976 9912 5259", 
+          icon: <FiPhoneCall className="text-2xl" />, 
+          link: "tel:+97699125259" 
+        },
+        { 
           title: "Facebook", 
-          value: "YOUR Next step",  
+          value: "YOUR Next Step",  
           icon: <FaFacebook className="text-2xl" />, 
-          link: "https://www.facebook.com/YOURNextStep" 
+          link: "https://www.facebook.com/profile.php?id=61585757210914" 
         },
       ].map((item) => (
         <a

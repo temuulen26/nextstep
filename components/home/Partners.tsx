@@ -31,25 +31,35 @@ export default function Partners() {
           Хамтрагч байгууллагууд
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 items-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12 items-center">
           {partners.map((partner, i) => (
             <a
               key={i}
               href={partner.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center group transition-transform hover:scale-105"
+              className="group flex flex-col items-center transition-transform"
             >
-              <Image
-                src={partner.logo}
-                alt={partner.name}
-                width={140}
-                height={60}
-                className="object-contain mb-2"
-              />
-              <span className="text-gray-800 font-medium flex items-center gap-1 transition-colors group-hover:text-blue-500">
+              <div
+                className="relative mb-4 animate-float
+                  group-hover:scale-110 transition-transform duration-300"
+              >
+                <div className="absolute inset-0 rounded-full blur-2xl bg-[#ff673d] scale-90 -z-10" />
+
+                <Image
+                  src={partner.logo}
+                  alt={partner.name}
+                  width={140}
+                  height={60}
+                  className="object-contain"
+                />
+              </div>
+
+              <span className="text-gray-800 font-medium flex items-center gap-1 transition-colors group-hover:text-[#ff673d]">
                 {partner.name}
-                <span className="transition-transform group-hover:translate-x-1">→</span>
+                <span className="transition-transform group-hover:translate-x-1">
+                  →
+                </span>
               </span>
             </a>
           ))}

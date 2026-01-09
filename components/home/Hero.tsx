@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-orange-100 via-white to-white">
+    <section className="relative overflow-hidden bg-gradient-to-br from-[#ff673d]/1 via-white to-white">
       
       {/* Glow background */}
       <div className="absolute -top-32 -left-32 w-[500px] h-[500px] bg-orange-300/30 rounded-full blur-3xl" />
@@ -21,7 +21,7 @@ export default function Hero() {
           transition={{ duration: 0.8 }}
         >
           <h1 className="text-3xl md:text-5xl font-extrabold leading-tight">
-            Таны <span className="text-orange-500">дараагийн алхам</span><br />
+            Таны <span className="text-[#ff673d]">дараагийн алхам</span><br />
             эндээс эхэлнэ
           </h1>
 
@@ -38,14 +38,14 @@ export default function Hero() {
           >
             <Link
               href="/auth/register"
-              className="bg-orange-500 text-white px-8 py-3 rounded-xl font-medium shadow-lg hover:bg-orange-600 hover:scale-105 transition"
+              className="bg-[#ff673d] text-white px-8 py-3 rounded-xl font-medium shadow-lg hover:bg-orange-600 hover:scale-105 transition"
             >
               Бүртгүүлэх
             </Link>
 
             <Link
               href="/surveys"
-              className="border px-8 py-3 rounded-xl font-medium hover:bg-white hover:shadow transition"
+              className="border px-8 py-3 rounded-xl font-medium hover:bg-orange-100 hover:shadow transition"
             >
               Судалгаа бөглөх
             </Link>

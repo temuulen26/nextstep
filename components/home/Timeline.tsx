@@ -34,7 +34,7 @@ export default function Timeline() {
         {steps.map((step, i) => (
           <div
             key={i}
-            className="bg-[#e4c3811a] rounded-3xl p-8 text-center shadow-md hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
+            className="bg-gradient-to-br from-[#FFE1D6] via-[#FFE1D6] to-[#FFB199] rounded-3xl p-8 text-center shadow-md hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300"
           >
             <div className="w-40 h-40 mx-auto mb-6 relative">
               <Image
