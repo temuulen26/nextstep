@@ -3,8 +3,33 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { clearAuth, getRoleHome, getStoredAuthUser, type Role } from "@/lib/auth";
 
 export default function Header() {
+  const [role, setRole] = useState<Role | null>(null);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = getStoredAuthUser();
+    setRole(user?.role ?? null);
+  }, [pathname]);
+
+  const roleLabel = useMemo(() => {
+    if (role === "ADMIN") return "Админ";
+    if (role === "MENTOR") return "Ментор";
+    if (role === "USER") return "Сурагч";
+    return null;
+  }, [role]);
+
+  const handleLogout = () => {
+    clearAuth();
+    setRole(null);
+    router.replace("/");
+  };
+
   return (
     <motion.header
       initial={{ y: -20, opacity: 0 }}
@@ -59,13 +84,34 @@ export default function Header() {
 
         {/* CTA */}
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-          <Link
-            href="/auth/login"
-            className="relative overflow-hidden bg-[#FF673d] text-white px-5 py-2 rounded-xl font-medium shadow-lg hover:bg-orange-600 transition"
-          >
-            <span className="relative z-10">Нэвтрэх</span>
-            <span className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100 transition" />
-          </Link>
+          {role ? (
+            <div className="flex items-center gap-3">
+              <Link
+                href={getRoleHome(role)}
+                className="relative overflow-hidden bg-[#FF673d] text-white px-5 py-2 rounded-xl font-medium shadow-lg hover:bg-orange-600 transition"
+              >
+                <span className="relative z-10">
+                  {roleLabel ?? "Миний хэсэг"}
+                </span>
+                <span className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100 transition" />
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="text-sm font-medium text-gray-600 hover:text-[#ff673d] transition"
+              >
+                Гарах
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="relative overflow-hidden bg-[#FF673d] text-white px-5 py-2 rounded-xl font-medium shadow-lg hover:bg-orange-600 transition"
+            >
+              <span className="relative z-10">Нэвтрэх</span>
+              <span className="absolute inset-0 bg-white/20 opacity-0 hover:opacity-100 transition" />
+            </Link>
+          )}
         </motion.div>
       </div>
     </motion.header>
