@@ -1,22 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { API_URL } from "@/lib/api";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { getStoredAuthUser } from "@/lib/auth";
-
-type CourseRow = {
-  id?: number;
-  code: string;
-  name: string;
-  goal: string;
-  worst: string;
-  expectation: string;
-  final: string;
-};
+import { useGpa, type CourseRow, type SemesterRow } from "@/lib/hooks/useGpa";
+import { useBanner } from "@/lib/hooks/useBanner";
+import { CourseTable } from "@/components/calculator/CourseTable";
+import { SemesterTable } from "@/components/calculator/SemesterTable";
+import { GPASummary } from "@/components/calculator/GPASummary";
+import { Banner } from "@/components/calculator/Banner";
 
 export default function CalculatorPage() {
-  const [rows, setRows] = useState<CourseRow[]>([]);
-  const [draft, setDraft] = useState<CourseRow>({
+  const [role, setRole] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Omit<CourseRow, "id">>({
     code: "",
     name: "",
     goal: "",
@@ -24,159 +19,84 @@ export default function CalculatorPage() {
     expectation: "",
     final: "",
   });
-  const [currentGpaInput, setCurrentGpaInput] = useState("");
-  const [summaryGpa, setSummaryGpa] = useState({
-    goal: "0.00",
-    worst: "0.00",
-    expectation: "0.00",
-    final: "0.00",
+  const [semesterDraft, setSemesterDraft] = useState<Omit<SemesterRow, "id">>({
+    yearStart: "",
+    yearEnd: "",
+    season: "",
+    classIndex: "",
+    className: "",
+    finalGpa: "",
   });
-  const [error, setError] = useState<string | null>(null);
+
+  const {
+    rows,
+    semesterRows,
+    summaryGpa,
+    error,
+    addRow: handleAddRow,
+    updateRow: handleUpdateRow,
+    updateRowLocal,
+    removeRow: handleRemoveRow,
+    addSemesterRow: handleAddSemesterRow,
+    removeSemesterRow: handleRemoveSemesterRow,
+  } = useGpa();
+
+  const {
+    bannerMessage,
+    bannerDraft,
+    bannerLoading,
+    bannerSaving,
+    bannerError,
+    setBannerDraft,
+    saveBanner,
+  } = useBanner();
+
+  const yearRanges = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    return Array.from({ length: 6 }, (_, index) => {
+      const start = currentYear - 1 - index;
+      const end = start + 1;
+      return {
+        value: `${start}-${end}`,
+        label: `${start} - ${end}`,
+        start,
+        end,
+      };
+    });
+  }, []);
 
   useEffect(() => {
     const user = getStoredAuthUser();
-    if (!user?.token) {
-      return;
-    }
-    Promise.all([
-      fetch(`${API_URL}/gpa`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      }),
-      fetch(`${API_URL}/gpa/summary`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      }),
-    ])
-      .then(async ([rowsRes, summaryRes]) => {
-        if (!rowsRes.ok) {
-          throw new Error(rowsRes.statusText || "Request failed");
-        }
-        if (!summaryRes.ok) {
-          throw new Error(summaryRes.statusText || "Request failed");
-        }
-        const rowsData = await rowsRes.json();
-        const summaryData = await summaryRes.json();
-        return { rowsData, summaryData };
-      })
-      .then(
-        ({
-          rowsData,
-          summaryData,
-        }: {
-          rowsData: Array<Record<string, string | number | null>>;
-          summaryData: {
-            rawScores?: string | null;
-            goalGpa?: number;
-            worstGpa?: number;
-            expectationGpa?: number;
-            finalGpa?: number;
-          };
-        }) => {
-          const mapped = rowsData.map((row) => ({
-            id: Number(row.id),
-            code: String(row.code ?? ""),
-            name: String(row.name ?? ""),
-            goal: row.goal ? String(row.goal) : "",
-            worst: row.worst ? String(row.worst) : "",
-            expectation: row.expectation ? String(row.expectation) : "",
-            final: row.finalScore ? String(row.finalScore) : "",
-          }));
-          setRows(mapped);
-          setCurrentGpaInput(summaryData.rawScores ?? "");
-          setSummaryGpa({
-            goal:
-              typeof summaryData.goalGpa === "number"
-                ? summaryData.goalGpa.toFixed(2)
-                : "0.00",
-            worst:
-              typeof summaryData.worstGpa === "number"
-                ? summaryData.worstGpa.toFixed(2)
-                : "0.00",
-            expectation:
-              typeof summaryData.expectationGpa === "number"
-                ? summaryData.expectationGpa.toFixed(2)
-                : "0.00",
-            final:
-              typeof summaryData.finalGpa === "number"
-                ? summaryData.finalGpa.toFixed(2)
-                : "0.00",
-          });
-        }
-      )
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : "Алдаа гарлаа");
-      });
+    setRole(user?.role ?? null);
   }, []);
 
-  const updateRow = (
-    index: number,
-    key: keyof CourseRow,
-    value: string
-  ) => {
-    setRows((prev) => {
-      const next = [...prev];
-      next[index] = { ...next[index], [key]: value };
-      return next;
-    });
-  };
+  const updateDraft = useCallback(
+    (key: keyof Omit<CourseRow, "id">, value: string) => {
+      setDraft((prev) => ({ ...prev, [key]: value }));
+    },
+    []
+  );
 
-  const updateDraft = (key: keyof CourseRow, value: string) => {
-    setDraft((prev) => ({ ...prev, [key]: value }));
-  };
+  const updateSemesterDraft = useCallback(
+    (key: keyof Omit<SemesterRow, "id">, value: string) => {
+      setSemesterDraft((prev) => ({ ...prev, [key]: value }));
+    },
+    []
+  );
 
-  const addRow = async () => {
+  const updateRow = useCallback(
+    (index: number, key: keyof CourseRow, value: string) => {
+      updateRowLocal(index, { [key]: value });
+    },
+    [updateRowLocal]
+  );
+
+  const addRow = useCallback(async () => {
     if (!draft.code.trim() || !draft.name.trim()) {
       return;
     }
-    setError(null);
-    const user = getStoredAuthUser();
-    if (!user?.token) {
-      setError("Нэвтэрч орно уу.");
-      return;
-    }
     try {
-      const res = await fetch(`${API_URL}/gpa`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-        },
-        body: JSON.stringify({
-          code: draft.code,
-          name: draft.name,
-          goal: draft.goal || null,
-          worst: draft.worst || null,
-          expectation: draft.expectation || null,
-          finalScore: draft.final || null,
-        }),
-      });
-      if (!res.ok) {
-        throw new Error(res.statusText || "Request failed");
-      }
-      const created = (await res.json()) as {
-        id: number;
-        code: string;
-        name: string;
-        goal?: string | null;
-        worst?: string | null;
-        expectation?: string | null;
-        finalScore?: string | null;
-      };
-      setRows((prev) => [
-        ...prev,
-        {
-          id: created.id,
-          code: created.code,
-          name: created.name,
-          goal: created.goal ?? "",
-          worst: created.worst ?? "",
-          expectation: created.expectation ?? "",
-          final: created.finalScore ?? "",
-        },
-      ]);
+      await handleAddRow(draft);
       setDraft({
         code: "",
         name: "",
@@ -185,105 +105,47 @@ export default function CalculatorPage() {
         expectation: "",
         final: "",
       });
-      await refreshSummary();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Алдаа гарлаа");
+      // Error is handled by the hook
     }
-  };
+  }, [draft, handleAddRow]);
 
-  const refreshSummary = async () => {
-    const user = getStoredAuthUser();
-    if (!user?.token) {
+  const saveRow = useCallback(
+    async (row: CourseRow) => {
+      await handleUpdateRow(row);
+    },
+    [handleUpdateRow]
+  );
+
+  const addSemesterRow = useCallback(async () => {
+    if (
+      !semesterDraft.yearStart.trim() ||
+      !semesterDraft.yearEnd.trim() ||
+      !semesterDraft.season.trim()
+    ) {
       return;
     }
     try {
-      const res = await fetch(`${API_URL}/gpa/summary`, {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      });
-      if (!res.ok) {
-        throw new Error(res.statusText || "Request failed");
-      }
-      const data = (await res.json()) as {
-        goalGpa?: number;
-        worstGpa?: number;
-        expectationGpa?: number;
-        finalGpa?: number;
-      };
-      setSummaryGpa({
-        goal:
-          typeof data.goalGpa === "number" ? data.goalGpa.toFixed(2) : "0.00",
-        worst:
-          typeof data.worstGpa === "number" ? data.worstGpa.toFixed(2) : "0.00",
-        expectation:
-          typeof data.expectationGpa === "number"
-            ? data.expectationGpa.toFixed(2)
-            : "0.00",
-        final:
-          typeof data.finalGpa === "number" ? data.finalGpa.toFixed(2) : "0.00",
+      await handleAddSemesterRow(semesterDraft);
+      setSemesterDraft({
+        yearStart: "",
+        yearEnd: "",
+        season: "",
+        classIndex: "",
+        className: "",
+        finalGpa: "",
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Алдаа гарлаа");
+      // Error is handled by the hook
     }
-  };
+  }, [semesterDraft, handleAddSemesterRow]);
 
-  const saveRow = async (row: CourseRow) => {
-    if (!row.id) {
+  const handleSaveBanner = useCallback(async () => {
+    if (role !== "ADMIN") {
       return;
     }
-    const user = getStoredAuthUser();
-    if (!user?.token) {
-      return;
-    }
-    await fetch(`${API_URL}/gpa/${row.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: JSON.stringify({
-        code: row.code,
-        name: row.name,
-        goal: row.goal || null,
-        worst: row.worst || null,
-        expectation: row.expectation || null,
-        finalScore: row.final || null,
-      }),
-    });
-    await refreshSummary();
-  };
-
-  const removeRow = async (index: number) => {
-    const row = rows[index];
-    if (!row) {
-      return;
-    }
-    setError(null);
-    const user = getStoredAuthUser();
-    if (!user?.token) {
-      setError("Нэвтэрч орно уу.");
-      return;
-    }
-    if (row.id) {
-      try {
-        const res = await fetch(`${API_URL}/gpa/${row.id}`, {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-        if (!res.ok) {
-          throw new Error(res.statusText || "Request failed");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Алдаа гарлаа");
-        return;
-      }
-    }
-    setRows((prev) => prev.filter((_, rowIndex) => rowIndex !== index));
-    await refreshSummary();
-  };
+    await saveBanner();
+  }, [role, saveBanner]);
 
   return (
     <div className="relative overflow-hidden">
@@ -300,226 +162,51 @@ export default function CalculatorPage() {
             Голч дүн тооцоологч
           </h1>
           <p className="text-gray-600 max-w-2xl">
-            text
+            Оюутан та дүнгээ тооцоолоно уу...
           </p>
         </header>
 
         <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <div className="rounded-3xl border border-white/70 bg-white/70 backdrop-blur-xl shadow-xl overflow-x-auto">
-            <table className="min-w-[880px] w-full border-collapse text-left">
-              <thead className="bg-slate-900 text-white">
-                <tr>
-                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
-                    Index
-                  </th>
-                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
-                    Хичээл
-                  </th>
-                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
-                    Goal
-                  </th>
-                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
-                    Worst
-                  </th>
-                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
-                    Expectation
-                  </th>
-                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
-                    Final
-                  </th>
-                  <th className="p-4 text-xs font-semibold uppercase tracking-widest text-center">
-                    Устгах
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-slate-200 bg-white/70">
-                  <td className="p-4">
-                    <input
-                      value={draft.code}
-                      onChange={(event) =>
-                        updateDraft("code", event.target.value)
-                      }
-                      placeholder="CODE"
-                      className="w-24 rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                    />
-                  </td>
-                  <td className="p-4">
-                    <input
-                      value={draft.name}
-                      onChange={(event) =>
-                        updateDraft("name", event.target.value)
-                      }
-                      placeholder="Хичээлийн нэр"
-                      className="w-full rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                    />
-                  </td>
-                  {(["goal", "worst", "expectation", "final"] as const).map(
-                    (field) => (
-                      <td key={field} className="p-4">
-                        <input
-                          value={draft[field]}
-                          onChange={(event) =>
-                            updateDraft(field, event.target.value)
-                          }
-                          placeholder="-"
-                          className="w-20 rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                        />
-                      </td>
-                    )
-                  )}
-                  <td className="p-4 text-center">
-                    <button
-                      type="button"
-                      onClick={addRow}
-                      className="inline-flex items-center rounded-md bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800 transition"
-                    >
-                      Нэмэх
-                    </button>
-                  </td>
-                </tr>
-                {rows.map((row, index) => (
-                  <tr
-                    key={`${row.code}-${row.id ?? index}`}
-                    className="border-b border-slate-200 last:border-none"
-                  >
-                    <td className="p-4">
-                      <input
-                        value={row.code}
-                        onChange={(event) =>
-                          updateRow(index, "code", event.target.value)
-                        }
-                        onBlur={() => saveRow(rows[index])}
-                        className="w-24 rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                      />
-                    </td>
-                    <td className="p-4">
-                      <input
-                        value={row.name}
-                        onChange={(event) =>
-                          updateRow(index, "name", event.target.value)
-                        }
-                        onBlur={() => saveRow(rows[index])}
-                        className="w-full rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                      />
-                    </td>
-                    {(["goal", "worst", "expectation", "final"] as const).map(
-                      (field) => (
-                        <td key={field} className="p-4">
-                          <input
-                            value={row[field]}
-                            onChange={(event) =>
-                              updateRow(index, field, event.target.value)
-                            }
-                            onBlur={() => saveRow(rows[index])}
-                            placeholder="-"
-                            className="w-20 rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-sm font-semibold text-slate-700 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                          />
-                        </td>
-                      )
-                    )}
-                    <td className="p-4 text-center">
-                      <button
-                        type="button"
-                        onClick={() => removeRow(index)}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-500 hover:border-red-300 hover:text-red-600 transition"
-                        aria-label="Remove row"
-                      >
-                        ×
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-6">
+            <CourseTable
+              rows={rows}
+              draft={draft}
+              onUpdateDraft={updateDraft}
+              onAddRow={addRow}
+              onUpdateRow={updateRow}
+              onSaveRow={saveRow}
+              onRemoveRow={handleRemoveRow}
+            />
+
+            <SemesterTable
+              rows={semesterRows}
+              draft={semesterDraft}
+              yearRanges={yearRanges}
+              onUpdateDraft={updateSemesterDraft}
+              onAddRow={addSemesterRow}
+              onRemoveRow={handleRemoveSemesterRow}
+            />
           </div>
 
-          <aside className="rounded-3xl border border-orange-100 bg-white/80 p-6 shadow-xl backdrop-blur-xl">
-            <div className="space-y-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-500">
-                GPA
-              </p>
-              <div className="space-y-2">
-                <input
-                  value={currentGpaInput}
-                  onChange={(event) => setCurrentGpaInput(event.target.value)}
-                  onBlur={async () => {
-                    setError(null);
-                    const user = getStoredAuthUser();
-                    if (!user?.token) {
-                      setError("Нэвтэрч орно уу.");
-                      return;
-                    }
-                    try {
-                      const res = await fetch(`${API_URL}/gpa/summary`, {
-                        method: "PUT",
-                        headers: {
-                          "Content-Type": "application/json",
-                          Authorization: `Bearer ${user.token}`,
-                        },
-                        body: JSON.stringify({
-                          rawScores: currentGpaInput,
-                        }),
-                      });
-                      if (!res.ok) {
-                        throw new Error(res.statusText || "Request failed");
-                      }
-                      const data = (await res.json()) as {
-                        rawScores?: string | null;
-                        goalGpa?: number;
-                        worstGpa?: number;
-                        expectationGpa?: number;
-                        finalGpa?: number;
-                      };
-                      setSummaryGpa({
-                        goal:
-                          typeof data.goalGpa === "number"
-                            ? data.goalGpa.toFixed(2)
-                            : "0.00",
-                        worst:
-                          typeof data.worstGpa === "number"
-                            ? data.worstGpa.toFixed(2)
-                            : "0.00",
-                        expectation:
-                          typeof data.expectationGpa === "number"
-                            ? data.expectationGpa.toFixed(2)
-                            : "0.00",
-                        final:
-                          typeof data.finalGpa === "number"
-                            ? data.finalGpa.toFixed(2)
-                            : "0.00",
-                      });
-                      if (typeof data.rawScores === "string") {
-                        setCurrentGpaInput(data.rawScores);
-                      }
-                    } catch (err) {
-                      setError(
-                        err instanceof Error ? err.message : "Алдаа гарлаа"
-                      );
-                    }
-                  }}
-                  placeholder="Одоогийн голч"
-                  className="w-full rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-2xl font-black text-slate-900 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200"
-                />
-                <div className="grid gap-2 text-sm text-slate-600">
-                  <p>Goal GPA: {summaryGpa.goal}</p>
-                  <p>Worst GPA: {summaryGpa.worst}</p>
-                  <p>Expectation GPA: {summaryGpa.expectation}</p>
-                  <p>Final GPA: {summaryGpa.final}</p>
-                </div>
-              </div>
-              <p className="text-base text-slate-600">current / 4.00</p>
-            </div>
-            {error ? (
-              <p className="mt-4 text-sm text-red-600">{error}</p>
-            ) : null}
+          <aside className="space-y-6">
+            <GPASummary summaryGpa={summaryGpa} error={error} />
 
-            <div className="mt-8 space-y-4 text-sm text-slate-600">
+            <div className="space-y-4 text-sm text-slate-600">
+              <Banner
+                message={bannerMessage}
+                loading={bannerLoading}
+                saving={bannerSaving}
+                error={bannerError}
+                isAdmin={role === "ADMIN"}
+                draft={bannerDraft}
+                onDraftChange={setBannerDraft}
+                onSave={handleSaveBanner}
+              />
+
               <div className="rounded-2xl bg-orange-50/70 p-4">
                 <p className="font-semibold text-slate-800">Зорилго</p>
                 <p className="mt-2">
-                  Хамгийн бага болон зорилтот дүнгээ оруулаад, дохио өгөгдлөө
-                  бодитоор харьцуул.
+                  Төсөөлж буй хамгийн бага болон зорилтот дүнгээ оруулаад бодитоор харьцуул.
                 </p>
               </div>
               <div className="rounded-2xl bg-slate-900 text-white p-4">
