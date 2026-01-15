@@ -28,7 +28,7 @@ export default function Hero() {
           <p className="mt-6 text-gray-600 text-lg leading-relaxed">
             <span className="font-semibold text-gray-800">Next Step-Өөрийгөө бүтээх эхний алхам</span>
             <br /><br />
-            BE CONFUSED AND ALL! THAT'S AN ACTUAL PRIVILEGE!
+            BE CONFUSED AND ALL! THAT&apos;S AN ACTUAL PRIVILEGE!
           </p>
           <motion.div
             className="mt-10 flex gap-4"

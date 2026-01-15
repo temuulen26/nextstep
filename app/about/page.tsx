@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useState } from "react";
 import { FiMail, FiPhoneCall } from "react-icons/fi";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
-import { i } from "framer-motion/client";
 
 const images = [
   "/picture1.png",

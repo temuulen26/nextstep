@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import Image from "next/image";
 import { API_URL } from "@/lib/api";
 import { getStoredAuthUser } from "@/lib/auth";
 
@@ -253,9 +254,11 @@ export default function NewsPage() {
                 Төхөөрөмжөөс зураг сонгоно.
               </p>
               {coverPreview ? (
-                <img
+                <Image
                   src={coverPreview}
                   alt="Cover preview"
+                  width={400}
+                  height={128}
                   className="h-32 w-full rounded-lg object-cover"
                 />
               ) : null}
@@ -328,11 +331,12 @@ export default function NewsPage() {
                   </p>
                 ) : null}
                 {coverUrl ? (
-                  <img
+                  <Image
                     src={coverUrl}
                     alt={item.title}
+                    width={400}
+                    height={192}
                     className="mt-4 h-48 w-full rounded-xl object-cover"
-                    loading="lazy"
                   />
                 ) : null}
                 <p className="mt-4 text-xs text-gray-400">
