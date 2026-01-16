@@ -3,17 +3,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clearAuth, getRoleHome, getStoredAuthUser, type Role } from "@/lib/auth";
 
 export default function Header() {
-  const [role, setRole] = useState<Role | null>(() => {
-    const user = getStoredAuthUser();
-    return user?.role ?? null;
-  });
+  const [role, setRole] = useState<Role | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const user = getStoredAuthUser();
+    setRole(user?.role ?? null);
+  }, []);
 
   const roleLabel = useMemo(() => {
     if (role === "ADMIN") return "Админ";

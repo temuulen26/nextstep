@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 
 const universities = [
@@ -199,7 +199,7 @@ export default function UniversitiesPage() {
                   {/* CTA (visual only) */}
                   <div className="pt-4 flex items-center justify-center gap-2 text-[#ff673d] font-semibold">
                     Дэлгэрэнгүй үзэх
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRightIcon className="w-4 h-4" />
                   </div>
                 </div>
               </motion.div>
