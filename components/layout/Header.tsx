@@ -33,7 +33,6 @@ export default function Header() {
     { name: "Их сургууль", href: "/universities" },
     { name: "Менторууд", href: "/mentors" },
     { name: "Судалгаа", href: "/surveys" },
-    { name: "Мэдээ Мэдээлэл", href: "/news" },
     { name: "Голч тооцоологч", href: "/calculator" },
     { name: "Бидний тухай", href: "/about" },
   ];
