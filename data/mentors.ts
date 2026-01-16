@@ -397,7 +397,7 @@ export const mentors = [
     slug: "enkhtur",
     name: "М. Энхтөр",
     school: "МГТИС",
-    image: "/mentor/turuu.png",
+    image: "/mentor/turuu.jpg",
     major: "Механик инженер",
     level: "1-р түвшин",
     email: "m.enkhtur@gmit.edu.mn",
