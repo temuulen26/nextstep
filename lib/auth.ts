@@ -9,6 +9,15 @@ export type AuthUser = {
   status: string;
 };
 
+export function subscribeToAuthChanges(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener("auth:changed", onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener("auth:changed", onChange);
+  };
+}
+
 export function getStoredAuthUser(): AuthUser | null {
   if (typeof window === "undefined") {
     return null;
@@ -22,6 +31,15 @@ export function getStoredAuthUser(): AuthUser | null {
   } catch {
     return null;
   }
+}
+
+export function setStoredAuthUser(user: AuthUser) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  localStorage.setItem("authToken", user.token);
+  localStorage.setItem("authUser", JSON.stringify(user));
+  window.dispatchEvent(new Event("auth:changed"));
 }
 
 export function getRoleHome(role: Role): string {
@@ -42,4 +60,5 @@ export function clearAuth() {
   }
   localStorage.removeItem("authToken");
   localStorage.removeItem("authUser");
+  window.dispatchEvent(new Event("auth:changed"));
 }

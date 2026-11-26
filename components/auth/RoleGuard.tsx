@@ -1,31 +1,30 @@
 "use client";
 
-import { useMemo } from "react";
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { getRoleHome, getStoredAuthUser, type Role } from "@/lib/auth";
+import { getRoleHome, getStoredAuthUser, subscribeToAuthChanges, type Role } from "@/lib/auth";
 
 type RoleGuardProps = {
   allowed: Role[];
   children: React.ReactNode;
 };
 
-export default function RoleGuard({ allowed, children }: RoleGuardProps) {
-  const { status, homePath } = useMemo(() => {
-    const user = getStoredAuthUser();
-    if (!user) {
-      return { status: "blocked" as const, homePath: "/auth/login" };
-    }
-    const homePath = getRoleHome(user.role);
-    if (!allowed.includes(user.role)) {
-      return { status: "blocked" as const, homePath };
-    }
-    return { status: "allowed" as const, homePath };
-  }, [allowed]);
+function getStoredRole() {
+  return getStoredAuthUser()?.role ?? null;
+}
 
-  if (status === "allowed") {
+export default function RoleGuard({ allowed, children }: RoleGuardProps) {
+  const role = useSyncExternalStore(subscribeToAuthChanges, getStoredRole, () => undefined);
+
+  if (role === undefined) {
+    return <div className="container py-20 text-center" />;
+  }
+
+  if (role && allowed.includes(role)) {
     return <>{children}</>;
   }
 
+  const homePath = role ? getRoleHome(role) : "/auth/login";
   return (
     <div className="container py-20 text-center">
       <p className="text-lg font-semibold text-gray-800">Энэ хуудсанд хандах эрхгүй байна.</p>

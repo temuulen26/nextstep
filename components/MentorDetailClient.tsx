@@ -2,18 +2,19 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { HeartIcon } from "@heroicons/react/24/solid";
 import { useState } from "react";
 
 interface Mentor {
   name: string;
   image: string;
+  email: string;
   bio: string;
   examPrep: string;
   expectationVsReality: string;
   schoolTests: string;
-  activities: string;
-  skills: string;
+  activities?: string;
+  skills?: string;
   threeWords: string[];
   posts: { title: string; date: string; content: string }[];
   school: string;
@@ -22,20 +23,10 @@ interface Mentor {
 
 export default function MentorDetailClient({ mentor }: { mentor: Mentor }) {
   const [liked, setLiked] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [question, setQuestion] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const email = mentor.email.trim();
+  const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const toggleLike = () => setLiked((prev) => !prev);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setQuestion("");
-    setShowForm(false);
-
-    console.log("Submitted question:", question);
-  };
 
   return (
     <main className="py-20 bg-gradient-to-b from-[#ff673d]/5 to-white min-h-screen">
@@ -65,7 +56,7 @@ export default function MentorDetailClient({ mentor }: { mentor: Mentor }) {
                 onClick={toggleLike}
                 className="p-2 rounded-full bg-[#ff673d]/20 hover:bg-[#ff673d]/30"
               >
-                <Heart
+                <HeartIcon
                   className={`w-6 h-6 ${liked ? "fill-[#ff673d] text-[#ff673d]" : "text-gray-400"}`}
                 />
               </motion.button>
@@ -81,8 +72,12 @@ export default function MentorDetailClient({ mentor }: { mentor: Mentor }) {
           <Detail title="ЭЕШ-д бэлдэх арга барил">{mentor.examPrep}</Detail>
           <Detail title="Төсөөлөл vs Бодит байдал">{mentor.expectationVsReality}</Detail>
           <Detail title="Сургуулийн сорилын нөлөө">{mentor.schoolTests}</Detail>
-          <Detail title="Хичээлээс гадуурх үйл ажиллагаа">{mentor.activities}</Detail>
-          <Detail title="Эзэмшиж буй ур чадвар">{mentor.skills}</Detail>
+          {mentor.activities && (
+            <Detail title="Хичээлээс гадуурх үйл ажиллагаа">{mentor.activities}</Detail>
+          )}
+          {mentor.skills && (
+            <Detail title="Эзэмшиж буй ур чадвар">{mentor.skills}</Detail>
+          )}
         </div>
 
         {/* Three Words */}
@@ -130,56 +125,14 @@ export default function MentorDetailClient({ mentor }: { mentor: Mentor }) {
           ))}
         </div>
 
-        {/* CTA & Chat Form */}
-        <div className="mt-8">
-          {!showForm && (
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              onClick={() => setShowForm(true)}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#ff673d] to-[#ff9461] text-white font-semibold shadow-md hover:shadow-xl transition-all"
-            >
-              Зөвлөгөө авах →
-            </motion.button>
-          )}
-
-          {showForm && (
-            <motion.form
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              onSubmit={handleSubmit}
-              className="mt-4 bg-white p-6 rounded-2xl shadow-lg border border-gray-200"
-            >
-              <label className="block text-gray-700 font-semibold mb-2">
-                Асуултаа бичнэ үү:
-              </label>
-              <textarea
-                className="w-full p-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#ff673d]/50 resize-none"
-                rows={4}
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Танд ямар зөвлөгөө хэрэгтэй вэ?"
-                required
-              />
-              <motion.button
-                type="submit"
-                whileHover={{ scale: 1.05 }}
-                className="mt-4 w-full py-3 rounded-2xl bg-[#ff673d] text-white font-semibold shadow-md hover:shadow-xl transition-all"
-              >
-                Илгээх
-              </motion.button>
-            </motion.form>
-          )}
-
-          {submitted && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="mt-4 text-green-600 font-semibold"
-            >
-              Таны асуулт амжилттай илгээгдлээ!
-            </motion.p>
-          )}
-        </div>
+        {hasEmail && (
+          <a
+            href={`mailto:${encodeURIComponent(email).replace("%40", "@")}`}
+            className="block w-full rounded-2xl bg-gradient-to-r from-[#ff673d] to-[#ff9461] py-4 text-center font-semibold text-white shadow-md hover:shadow-xl"
+          >
+            Менторт имэйл бичих
+          </a>
+        )}
 
       </div>
     </main>

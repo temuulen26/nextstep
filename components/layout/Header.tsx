@@ -13,8 +13,17 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    const user = getStoredAuthUser();
-    setRole(user?.role ?? null);
+    const syncRole = () => {
+      const user = getStoredAuthUser();
+      setRole(user?.role ?? null);
+    };
+    syncRole();
+    window.addEventListener("storage", syncRole);
+    window.addEventListener("auth:changed", syncRole);
+    return () => {
+      window.removeEventListener("storage", syncRole);
+      window.removeEventListener("auth:changed", syncRole);
+    };
   }, []);
 
   const roleLabel = useMemo(() => {
@@ -81,12 +90,20 @@ export default function Header() {
               </button>
             </>
           ) : (
-            <Link
-              href="/auth/login"
-              className="px-5 py-2 rounded-xl bg-[#FF673d] text-white font-medium shadow hover:bg-orange-600 transition"
-            >
-              Нэвтрэх
-            </Link>
+            <>
+              <Link
+                href="/auth/login"
+                className="px-5 py-2 rounded-xl bg-[#FF673d] text-white font-medium shadow hover:bg-orange-600 transition"
+              >
+                Нэвтрэх
+              </Link>
+              <Link
+                href="/auth/register"
+                className="px-5 py-2 rounded-xl border border-[#FF673d] text-[#FF673d] font-medium hover:bg-[#FF673d]/10 transition"
+              >
+                Бүртгүүлэх
+              </Link>
+            </>
           )}
         </div>
 
@@ -148,13 +165,22 @@ export default function Header() {
                     </button>
                   </>
                 ) : (
-                  <Link
-                    href="/auth/login"
-                    onClick={() => setMobileOpen(false)}
-                    className="block px-4 py-2 rounded-xl bg-[#FF673d] text-white font-medium shadow hover:bg-orange-600 transition"
-                  >
-                    Нэвтрэх
-                  </Link>
+                  <>
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-4 py-2 rounded-xl bg-[#FF673d] text-white font-medium shadow hover:bg-orange-600 transition mb-2"
+                    >
+                      Нэвтрэх
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      onClick={() => setMobileOpen(false)}
+                      className="block px-4 py-2 rounded-xl border border-[#FF673d] text-[#FF673d] font-medium hover:bg-[#FF673d]/10 transition"
+                    >
+                      Бүртгүүлэх
+                    </Link>
+                  </>
                 )}
               </div>
             </div>

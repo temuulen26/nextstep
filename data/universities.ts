@@ -1,5 +1,3 @@
-import { desc } from "framer-motion/client";
-
 export const universities = [
   {
     id: "1",

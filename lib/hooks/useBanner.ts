@@ -12,36 +12,6 @@ export function useBanner() {
   const [bannerSaving, setBannerSaving] = useState(false);
   const [bannerError, setBannerError] = useState<string | null>(null);
 
-  const loadBanner = useCallback(async () => {
-    let isMounted = true;
-    setBannerLoading(true);
-    setBannerError(null);
-
-    try {
-      const data = await fetchJson<{ message?: string | null }>("/banner");
-      if (!isMounted) {
-        return;
-      }
-      const message = data?.message?.trim() || defaultBannerMessage;
-      setBannerMessage(message);
-      setBannerDraft(message);
-    } catch (err) {
-      if (isMounted) {
-        setBannerError(
-          err instanceof Error ? err.message : "Алдаа гарлаа"
-        );
-      }
-    } finally {
-      if (isMounted) {
-        setBannerLoading(false);
-      }
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
   const saveBanner = useCallback(async () => {
     const user = getStoredAuthUser();
     if (!user?.token) {
@@ -70,11 +40,28 @@ export function useBanner() {
 
   useEffect(() => {
     let isMounted = true;
-    loadBanner();
+    fetchJson<{ message?: string | null }>("/banner")
+      .then((data) => {
+        if (isMounted) {
+          const message = data?.message?.trim() || defaultBannerMessage;
+          setBannerMessage(message);
+          setBannerDraft(message);
+        }
+      })
+      .catch((err: unknown) => {
+        if (isMounted) {
+          setBannerError(err instanceof Error ? err.message : "Алдаа гарлаа");
+        }
+      })
+      .finally(() => {
+        if (isMounted) {
+          setBannerLoading(false);
+        }
+      });
     return () => {
       isMounted = false;
     };
-  }, [loadBanner]);
+  }, []);
 
   return {
     bannerMessage,

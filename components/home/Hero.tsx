@@ -37,13 +37,6 @@ export default function Hero() {
             transition={{ delay: 0.4 }}
           >
             <Link
-              href="/auth/register"
-              className="bg-[#ff673d] text-white px-8 py-3 rounded-xl font-medium shadow-lg hover:bg-orange-600 hover:scale-105 transition"
-            >
-              Бүртгүүлэх
-            </Link>
-
-            <Link
               href="/surveys"
               className="border px-8 py-3 rounded-xl font-medium hover:bg-orange-100 hover:shadow transition"
             >

@@ -26,6 +26,10 @@ const partners = [
     logo: "/partners/greengold.jpg",
     url: "https://www.facebook.com/GreengoldhotelRestaurant",
   },
+  {
+    name: "InkTop Khuvsgul",
+    logo: "/partners/inktop.png",
+  },
 ]
 
 export default function Partners() {

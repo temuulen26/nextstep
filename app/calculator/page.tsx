@@ -304,8 +304,9 @@ export default function CalculatorPage() {
         </header>
 
         <div className="grid gap-6 lg:grid-cols-[2fr,1fr]">
-          <div className="rounded-3xl border border-white/70 bg-white/70 backdrop-blur-xl shadow-xl overflow-x-auto">
-            <table className="min-w-[880px] w-full border-collapse text-left">
+          <div className="min-w-0 space-y-6">
+            <div className="rounded-3xl border border-white/70 bg-white/70 backdrop-blur-xl shadow-xl overflow-x-auto">
+              <table className="min-w-[880px] w-full border-collapse text-left">
               <thead className="bg-slate-900 text-white">
                 <tr>
                   <th className="p-4 text-xs font-semibold uppercase tracking-widest">
@@ -379,7 +380,7 @@ export default function CalculatorPage() {
                 </tr>
                 {rows.map((row, index) => (
                   <tr
-                    key={`${row.code}-${row.id ?? index}`}
+                    key={row.id ?? index}
                     className="border-b border-slate-200 last:border-none"
                   >
                     <td className="p-4">
@@ -431,6 +432,64 @@ export default function CalculatorPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          <div className="rounded-3xl border border-white/70 bg-white/80 backdrop-blur-xl shadow-xl overflow-x-auto">
+            <div className="px-6 pt-6">
+              <h2 className="text-lg font-semibold text-slate-900">
+                Одоогийн улирлын GPA
+              </h2>
+              <p className="text-sm text-slate-500">
+                Одоогийн улирлын хичээлүүдийн дүнгийн жагсаалт.
+              </p>
+            </div>
+            <table className="min-w-[880px] w-full border-collapse text-left">
+              <thead className="text-slate-700">
+                <tr>
+                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
+                    Индекс
+                  </th>
+                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
+                    Хичээл
+                  </th>
+                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
+                    Эцсийн
+                  </th>
+                  <th className="p-4 text-xs font-semibold uppercase tracking-widest">
+                    Таамаг
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.length === 0 ? (
+                  <tr className="border-b border-slate-200">
+                    <td
+                      colSpan={4}
+                      className="p-4 text-sm text-slate-500"
+                    >
+                      Одоогоор мэдээлэл алга байна.
+                    </td>
+                  </tr>
+                ) : (
+                  rows.map((row, index) => (
+                    <tr
+                      key={`current-${row.code}-${row.id ?? index}`}
+                      className="border-b border-slate-200 last:border-none"
+                    >
+                      <td className="p-4 text-slate-700">{row.code}</td>
+                      <td className="p-4 text-slate-700">{row.name}</td>
+                      <td className="p-4 text-slate-700">
+                        {row.final || "-"}
+                      </td>
+                      <td className="p-4 text-slate-700">
+                        {row.expectation || "-"}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
           </div>
 
           <aside className="rounded-3xl border border-orange-100 bg-white/80 p-6 shadow-xl backdrop-blur-xl">

@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import AuthLayout from "../AuthLayout";
 import { postJson } from "@/lib/api";
-import { getRoleHome, type Role } from "@/lib/auth";
+import { getRoleHome, setStoredAuthUser, type Role } from "@/lib/auth";
 
 type AuthResponse = {
   token: string;
@@ -33,8 +33,7 @@ export default function LoginPage() {
         email,
         password,
       });
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("authUser", JSON.stringify(data));
+      setStoredAuthUser(data);
       router.replace(getRoleHome(data.role));
     } catch (err) {
       const message = err instanceof Error ? err.message : "Нэвтрэх үед алдаа гарлаа";
